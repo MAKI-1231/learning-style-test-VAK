@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>脳の使い方、間違ってるかも？学び方タイプ診断！</title>
+  <style>
+    body {
+      font-family: "Rounded Mplus 1c", "Arial", sans-serif;
+      background: #f0f8ff;
+      color: #333;
+      text-align: center;
+      padding: 2em;
+    }
+    h1 {
+      font-size: 1.8em;
+      color: #0066cc;
+      margin-bottom: 0.5em;
+    }
+    .question-box {
+      background: #fff;
+      border-radius: 1em;
+      padding: 2em;
+      max-width: 600px;
+      margin: 1em auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .btn {
+      font-size: 1em;
+      margin: 1em 1em;
+      padding: 0.6em 2em;
+      border: none;
+      border-radius: 1.5em;
+      background: #a2d5f2;
+      color: #003366;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #90c8e0;
+    }
+    #progressBar {
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 10px;
+      margin-top: 1em;
+    }
+    #progress {
+      height: 20px;
+      background-color: #66ccff;
+      width: 0%;
+      border-radius: 10px;
+      transition: width 0.3s ease-in-out;
+    }
+    #result {
+      font-size: 1.2em;
+      margin-top: 2em;
+    }
+    footer {
+      margin-top: 3em;
+    }
+    footer img {
+      width: 150px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    脳の使い方、間違ってるかも？<br />学び方タイプ診断テスト！
+  </h1>
+  <p>🎯 <strong>30個の質問に答えて、メイン感覚とサブ感覚の組み合わせを知ろう！</strong></p>
+
+  <div id="question-container" class="question-box">
+    <p id="question"></p>
+    <button class="btn" onclick="answer('yes')">YES</button>
+    <button class="btn" onclick="answer('no')">NO</button>
+    <div id="progressBar">
+      <div id="progress"></div>
+    </div>
+  </div>
+
+  <div id="result"></div>
+
+  <footer>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Brain_icon.svg/512px-Brain_icon.svg.png" alt="GORAQUE">
+  </footer>
+
+  <script>
+    const questions = [
+      // Visual (1–10)
+      "色分けしてノートを取ると、内容が整理されて覚えやすい。",
+      "写真や図解を見ながら学ぶのが好きだ。",
+      "ノートや教科書を『眺める』だけで復習することがある。",
+      "イメージを思い浮かべることで内容を思い出せる。",
+      "動画教材のほうが音声だけの教材よりも集中できる。",
+      "黒板やスライドの図を見ると理解しやすい。",
+      "文字情報（例：書いたメモ）で覚えるほうが得意だ。",
+      "説明よりも、例を『図で示してくれる』ほうが理解が早い。",
+      "レイアウトの整った資料を見ると、やる気が出る。",
+      "マインドマップなど、視覚的なまとめが効果的に感じる。",
+      // Auditory (11–20)
+      "声に出して読むと覚えやすくなる。",
+      "教材を音声で聴くのが好き。",
+      "授業など、人の話を聞いているときによく理解できる。",
+      "音で覚えた英単語やフレーズは忘れにくい。",
+      "自分で説明しながら覚えると定着しやすい。",
+      "リズムやメロディーで暗記することがある。",
+      "人に説明してもらうと理解しやすい。",
+      "音読をすると記憶に残りやすい。",
+      "本を読むとき、頭の中でナレーションしている感じがある。",
+      "聞き流しの英語学習が向いていると感じる。",
+      // Kinesthetic (21–30)
+      "実際にやってみることで覚えるタイプだ。",
+      "長時間座っている勉強スタイルは苦手。",
+      "書きながら・動きながらでないと覚えにくい。",
+      "手を動かすことで集中しやすくなる。",
+      "体を使った体験（例：実験・ワークショップ）で学ぶと身につきやすい。",
+      "ジェスチャーや動作と一緒に記憶することがある。",
+      "リズムに合わせて歩きながら覚えることがある。",
+      "スポーツや演劇など『動き』がある活動で学びやすい。",
+      "書いて、触れて、体を動かす方が実感がある。",
+      "同じ内容でも、『体で感じたこと』のほうが記憶に残りやすい。"
+    ];
+
+    const scores = { visual: 0, auditory: 0, kinesthetic: 0 };
+    let currentIndex = 0;
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    shuffle(questions);
+
+    const questionEl = document.getElementById("question");
+    const resultEl = document.getElementById("result");
+
+    function showQuestion() {
+      questionEl.textContent = `${currentIndex + 1}. ${questions[currentIndex]}`;
+      document.getElementById("progress").style.width = `${(currentIndex / questions.length) * 100}%`;
+    }
+
+    function answer(response) {
+      if (response === 'yes') {
+        if (currentIndex < 10) scores.visual++;
+        else if (currentIndex < 20) scores.auditory++;
+        else scores.kinesthetic++;
+      }
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const [main, sub] = sorted;
+      const type = `${main[0]} × ${sub[0]} 型`;
+      const emojis = { visual: "👀", auditory: "🎧", kinesthetic: "🤸‍♀️" };
+      const labels = {
+        "visual × visual": "🖼️ 情報は「見てなんぼ」！色・図・イメージで学ぶのが最強のタイプです。",
+        "visual × auditory": "🎧 映像＋音声がベスト！スライドや動画＋音で理解が深まるハイブリッド学習者。",
+        "visual × kinesthetic": "🤸‍♀️ 見たものをすぐ実践！図と体験を組み合わせることで記憶が定着するタイプです。",
+        "auditory × visual": "👀 話を聞いて、イメージで補強！言葉と図をセットで覚えるのが得意なタイプ。",
+        "auditory × auditory": "🎧 音がすべてのキー！音読・講義・説明でグングン理解が進むリスナー型学習者です。",
+        "auditory × kinesthetic": "🤸‍♀️ 聞いてすぐ実践！聞いたことを体で試すことでぐっと身につくタイプ。",
+        "kinesthetic × visual": "👀 体を動かしながら、図で確認！アクション＋ビジュアルで学ぶ動く図解マスターです。",
+        "kinesthetic × auditory": "🎧 耳と体がリンク！聞いたことをすぐにやってみたくなるアウトプット型学習者。",
+        "kinesthetic × kinesthetic": "🔥 百聞は一験にしかず！やって覚える最強体感派。動いてナンボの経験重視タイプです。"
+      };
+      const key = `${main[0]} × ${sub[0]}`;
+      resultEl.innerHTML = `<h2>${emojis[main[0]]}${emojis[sub[0]]} あなたは <strong>${type}</strong>！</h2><p>${labels[key]}</p>`;
+      document.getElementById("question-container").style.display = "none";
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
